@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_jenis_pkm_tree" model="ir.ui.view">
+        <field name="name">jenis.pkm.tree</field>
+        <field name="model">jenis.pkm</field>
+        <field name="arch" type="xml">
+            <tree string="Jenis PKM" export_xlsx="false" editable="bottom">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_jenis_pkm_form" model="ir.ui.view">
+        <field name="name">jenis.pkm.form</field>
+        <field name="model">jenis.pkm</field>
+        <field name="arch" type="xml">
+           <form string="Jenis PKM">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+              </form>
+        </field>
+    </record>
+
+    <record id="action_jenis_pkm" model="ir.actions.act_window">
+            <field name="name">Jenis PKM</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">jenis.pkm</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    
+    <menuitem id="menu_jenis_pkm"
+            name="Jenis PKM"
+            action="action_jenis_pkm"
+            parent="pengajuan_menu_root"
+            groups="pkm_custom.group_pkm_reviewer,pkm_custom.group_pkm_admin,pkm_custom.group_pkm_dospem,pkm_custom.group_pkm_mahasiswa"
+            sequence="3"/>
+
+</odoo>

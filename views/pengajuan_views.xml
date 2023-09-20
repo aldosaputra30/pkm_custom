@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="pengajuan_menu_root"
+        name="Pengajuan PKM"
+        groups="base.group_user"
+        web_icon="pkm_custom,static/description/logo.png"
+        />
+
+
+    <record id="view_pengajuan_tree" model="ir.ui.view">
+        <field name="name">pengajuan.tree</field>
+        <field name="model">pengajuan</field>
+        <field name="arch" type="xml">
+            <tree string="Pengajuan" export_xlsx="false">
+                <field name="name"/>
+                <field name="creator_id" string="Nama Pengajuan"/>
+                <field name="pkm_id"/>
+                <field name="judul_pkm"/>
+                <!-- <field name="deskripsi_pkm"/> -->
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_pengajuan_form" model="ir.ui.view">
+        <field name="name">pengajuan.form</field>
+        <field name="model">pengajuan</field>
+        <field name="arch" type="xml">
+           <form string="Pengajuan" duplicate="0">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="pengajuan,proses,diterima"/>
+                    <button name="action_batal" id="action_batal" string="Batalkan Pengajuan" class="btn-primary" type="object" attrs="{'invisible': [('state', 'in', ['batal','diterima'])], 'readonly': [('state', 'in', ('done','cancel','sale'))]}" groups="pkm_custom.group_pkm_reviewer,pkm_custom.group_pkm_admin,pkm_custom.group_pkm_mahasiswa" />
+                    <button name="action_proses" id="action_proses" string="Ajukan PKM" class="btn-primary" type="object" attrs="{'invisible': [('state', 'not in', ['pengajuan'])]}" groups="pkm_custom.group_pkm_reviewer,pkm_custom.group_pkm_admin,pkm_custom.group_pkm_mahasiswa"/>
+                    <button name="action_terima" id="action_terima" string="Terima PKM" class="btn-primary" type="object" attrs="{'invisible': [('state', 'not in', ['proses','revisi'])]}" groups="base.group_system, pkm_custom.group_pkm_reviewer,pkm_custom.group_pkm_admin"/>
+                    <button name="action_revisi" id="action_revisi" string="Revisi PKM" class="btn-primary" type="object" attrs="{'invisible': [('state', 'not in', ['proses'])]}" groups="base.group_system, pkm_custom.group_pkm_reviewer,pkm_custom.group_pkm_admin"/>
+                    <button name="action_tolak" id="action_tolak" string="Tolak PKM" class="btn-primary" type="object" attrs="{'invisible': [('state', 'not in', ['proses'])]}" groups="base.group_system, pkm_custom.group_pkm_reviewer,pkm_custom.group_pkm_admin"/>
+                    <button name="%(pkm_custom.wizard_assign_reviewer_action)d" string="Tugaskan Reviewer" attrs="{'invisible': [('reviewer_id','!=',False)]}" type="action" class="oe_highlight" groups="base.group_system,pkm_custom.group_pkm_admin"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Pengajuan Diterima" bg_color="bg-success" attrs="{'invisible': [('is_done', '=', False)]}" />
+                    <widget name="web_ribbon" title="Pengajuan Dibatalkan" bg_color="bg-danger" attrs="{'invisible': [('is_cancel', '=', False)]}" />
+                    <widget name="web_ribbon" title="Pengajuan Ditolak" bg_color="bg-danger" attrs="{'invisible': [('is_reject', '=', False)]}" />
+                    <widget name="web_ribbon" title="Revisi Pengajuan" bg_color="bg-warning" attrs="{'invisible': [('is_revisi', '=', False)]}" />
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="creator_id" string="Nama Pengajuan" attrs="{'invisible': [('creator_id','=',False)]}"/>
+                        <field name="judul_pkm" attrs="{'readonly': [('state', 'in', ('diterima','ditolak','batal','revisi'))]}"/>
+                        <field name="pkm_id" attrs="{'readonly': [('state', 'in', ('diterima','ditolak','batal','revisi'))]}"/>
+                        <field name="bidang_ilmu" attrs="{'readonly': [('state', 'in', ('diterima','ditolak','batal','revisi'))]}"/>
+                        <field name="program_studi" attrs="{'readonly': [('state', 'in', ('diterima','ditolak','batal','revisi'))]}"/>
+                        <field name="file" filename="file_name" attrs="{'readonly': [('state', 'in', ('diterima','ditolak','batal','revisi'))]}"/>
+                        <field name="catatan" attrs="{'readonly': [('state', 'in', ('diterima','ditolak','batal'))]}"/>
+                        <field name="reviewer_id" readonly="1"/>
+                        <field name="file_name" invisible="1"/>
+                        <field name="is_done" invisible="1"/>
+                        <field name="is_cancel" invisible="1"/>
+                        <field name="is_reject" invisible="1"/>
+                        <field name="is_revisi" invisible="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Tim Pengajuan" name="line_pengajuan">
+                            <group>
+                                <field name="dospem_id" domain="[('role','=','dosen_pembimbing')]" attrs="{'readonly': [('state', 'in', ('diterima','ditolak','batal','revisi'))]}"/>
+                            </group>
+                            <field
+                                name="line_pengajuan" widget="section_and_note_one2many" mode="tree" attrs="{'readonly': [('state', 'in', ('diterima','ditolak','batal','revisi'))]}">
+                                <form>
+                                    <group>
+                                        <field name="nama_anggota"/>
+                                        <field name="nim"/>
+                                        <field name="kelas"/>
+                                        <field name="jurusan"/>
+                                        <field name="nomor_hp"/>
+                                    </group>
+                                </form>
+                                <tree string="Tim Pengajuan" editable="bottom">
+                                    <field name="nama_anggota"/>
+                                    <field name="kelas"/>
+                                    <field name="jurusan"/>
+                                    <field name="nomor_hp"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Penilaian" name="line_penilaian">
+                            <field
+                                name="line_penilaian" widget="section_and_note_one2many" mode="tree" attrs="{'readonly': [('state', 'in', ('diterima','ditolak','batal'))]}">
+                                <form>
+                                    <group>
+                                        <field name="no"/>
+                                        <field name="kriteria"/>
+                                        <field name="bobot"/>
+                                        <field name="skor"/>
+                                        <field name="nilai"/>
+                                    </group>
+                                </form>
+                                <tree string="Penilaian" editable="bottom">
+                                    <field name="no"/>
+                                    <field name="kriteria"/>
+                                    <field name="bobot"/>
+                                    <field name="skor"/>
+                                    <field name="nilai"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Umpan Balik">
+                            <form>
+                                <sheet>
+                                    <group>
+                                        <field name="file_revisi" filename="file_name_revisi" attrs="{'readonly': [('state', 'in', ('diterima','ditolak','batal'))],'invisible': [('state', 'not in', ('revisi'))],'required': [('is_revisi', '=', True)]}"/>
+                                        <field name="file_name_revisi" invisible="1"/>
+                                    </group>
+                                </sheet>
+                            </form>
+                        </page>
+                        <page string="Lihat PDF">
+                            <form>
+                                <sheet>
+                                    <group>
+                                        <field name="file_preview" widget="pdf_viewer" filename="file_name" attrs="{'readonly': [('state', 'in', ('diterima','ditolak','batal','revisi'))]}"/>
+                                    </group>
+                                </sheet>
+                            </form>
+                        </page>
+                    </notebook>
+                </sheet>
+              </form>
+        </field>
+    </record>
+
+    <record id="pengajuan_kanban_view" model="ir.ui.view">
+            <field name="name">Pengajuan</field>
+            <field name="model">pengajuan</field>
+            <field name="arch" type="xml">
+                <kanban sample="1">
+                    <field name="name"/>
+                    <field name="judul_pkm"/>
+                    <progressbar field="state" colors='{"diterima": "success", "proses": "warning", "ditolak": "danger"}'/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                <div class="oe_kanban_details">
+                                    <strong class="o_kanban_record_title">
+                                        <strong>Judul Kegiatan: <field name="judul_pkm"/><br/>
+                                        Bidang Ilmu: <field name="bidang_ilmu"/></strong>
+                                    </strong>
+                                    <ul>
+                                        <li><strong>Jenis PKM: <field name="pkm_id"></field></strong></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+    <record id="action_pengajuan" model="ir.actions.act_window">
+        <field name="name">Seluruh Pengajuan</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">pengajuan</field>
+        <field name="view_mode">tree,kanban,form,graph</field>
+        <field name="context">{'delete':False,'duplicate':False}</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <record id="action_my_pengajuan" model="ir.actions.act_window">
+        <field name="name">Pengajuan Saya</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">pengajuan</field>
+        <field name="view_mode">tree,kanban,form,graph</field>
+        <field name="context">{}</field>
+        <field name="domain">[('creator_id','=',uid)]</field>
+    </record>
+
+    <!-- <record id="action_server_my_pengajuan" model="ir.actions.server">
+        <field name="name">Pengajuan Saya</field>
+        <field name="model_id" ref="model_pengajuan"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.my_pengajuan()
+        </field>
+        <field name="binding_model_id" ref="model_pengajuan"/>
+     </record> -->
+    
+    <record model="ir.ui.view" id="view_pengajuan_graph">
+        <field name="name">pengajuan.graph</field>
+        <field name="model">pengajuan</field>
+        <field name="arch" type="xml">
+            <graph string="Pengajuan" sample="1">
+                <field name="pkm_id"/>
+                <field name="judul_pkm"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_pengajuan_state_filter_pkm" model="ir.ui.view">
+        <field name="name">pengajuan.state.filter.pkm</field>
+        <field name="model">pengajuan</field>
+        <field name="arch" type="xml">
+            <search string="Pengajuan Search">
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="state" domain="[]" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="pengajuan_form_penilaian_restrict" model="ir.ui.view">
+        <field name="name">pengajuan.form.penilaian.restrict</field>
+        <field name="model">pengajuan</field>
+        <field name="inherit_id" ref="pkm_custom.view_pengajuan_form" />
+        <field name="groups_id" eval="[(6, 0, [ref('pkm_custom.group_pkm_mahasiswa') ])]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_penilaian']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='catatan']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <menuitem id="menu_pengajuan"
+            name="Pengajuan"
+            parent="pengajuan_menu_root"
+            sequence="2"/>
+
+    <menuitem id="all_pengajuan"
+            name="Seluruh Pengajuan"
+            parent="menu_pengajuan"
+            action="action_pengajuan"
+            sequence="10"
+            />
+
+    <menuitem id="my_pengajuan"
+            name="Pengajuan Saya"
+            parent="menu_pengajuan"
+            action="action_my_pengajuan"
+            sequence="1"
+            />
+
+</odoo>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="group_pkm_mahasiswa" model="res.groups">
+            <field name="name">Mahasiswa</field>
+        </record>
+
+        <record id="group_pkm_admin" model="res.groups">
+            <field name="name">Admin</field>
+        </record>
+
+        <record id="group_pkm_reviewer" model="res.groups">
+            <field name="name">Reviewer</field>
+        </record>
+        <record id="group_pkm_dospem" model="res.groups">
+            <field name="name">Dosen Pembimbing</field>
+        </record>
+
+    </data>
+</odoo>

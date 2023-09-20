@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pengajuan_judul_tree" model="ir.ui.view">
+        <field name="name">pengajuan.judul.tree</field>
+        <field name="model">pengajuan.judul</field>
+        <field name="arch" type="xml">
+            <tree string="Pengajuan Judul" export_xlsx="false">
+                <field name="name"/>
+                <field name="creator_id" string="Nama Pengajuan"/>
+                <field name="pkm_id"/>
+                <!-- <field name="deskripsi_pkm"/> -->
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_pengajuan_judul_form" model="ir.ui.view">
+        <field name="name">pengajuan.judul.form</field>
+        <field name="model">pengajuan.judul</field>
+        <field name="arch" type="xml">
+           <form string="Pengajuan Judul" duplicate="0">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="pengajuan"/>
+                    <button name="action_terima" string="Terima PKM" class="btn-primary" type="object" attrs="{'invisible': [('state', 'in', ['diterima'])]}" groups="pkm_custom.group_pkm_dospem"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+			                <button name="action_view_pengajuan" type="object"
+			                    class="oe_stat_button" icon="fa-th-list"
+			                    context="{'creator_id': creator_id}"			                    >
+			                    <div class="o_stat_info">
+			                        <field name="pengajuan_count" class="o_stat_value"/>
+			                        <span class="o_stat_text"> Pengajuan</span>
+			                    </div>
+			                </button>
+			           </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Masukkan Judul PKM" attrs="{'readonly': [('state', 'in', ('diterima','ditolak'))]}"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="creator_id" string="Nama Pengajuan" attrs="{'invisible': [('creator_id','=',False)], 'readonly': [('state', 'in', ('diterima','ditolak'))]}"/>
+                        <field name="pkm_id" attrs="{'readonly': [('state', 'in', ('diterima','ditolak'))]}"/>
+                        <field name="bidang_ilmu" attrs="{'readonly': [('state', 'in', ('diterima','ditolak'))]}"/>
+                        <field name="program_studi" attrs="{'readonly': [('state', 'in', ('diterima','ditolak'))]}"/>
+                        <field name="dospem_id" domain="[('role','=','dosen_pembimbing')]" attrs="{'readonly': [('state', 'in', ('diterima','ditolak'))]}"/>
+                        <field name="pengajuan_id" attrs="{'readonly': [('state', 'in', ('diterima','ditolak'))], 'invisible' :[('pengajuan_id', '=', False)]}"/>
+                    </group>
+                </sheet>
+              </form>
+        </field>
+    </record>
+    <record id="view_pengajuan_judul_filter_pkm" model="ir.ui.view">
+        <field name="name">pengajuan.judul.filter.pkm</field>
+        <field name="model">pengajuan.judul</field>
+        <field name="arch" type="xml">
+            <search string="Pengajuan Judul">
+                <group expand="0" string="Group By">
+                    <filter string="Dosen Pembimbing" name="dospem" domain="[]" context="{'group_by':'dospem_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_pengajuan_judul" model="ir.actions.act_window">
+        <field name="name">Pengajuan Judul</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">pengajuan.judul</field>
+        <field name="view_mode">tree,form,graph</field>
+        <field name="context">{'search_default_dospem': 1}</field>
+        <field name="domain">[]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Ajukan Judul anda 
+            </p>
+        </field>
+    </record>
+
+    <record id="action_my_pengajuan_judul" model="ir.actions.act_window">
+        <field name="name">Pengajuan Judul Saya</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">pengajuan.judul</field>
+        <field name="view_mode">tree,form,graph</field>
+        <field name="context">{}</field>
+        <field name="domain">[('creator_id','=',uid)]</field>
+    </record>
+
+    <record id="view_pengajuan_judul_state_filter_pkm" model="ir.ui.view">
+        <field name="name">pengajuan.judul.state.filter.pkm</field>
+        <field name="model">pengajuan.judul</field>
+        <field name="arch" type="xml">
+            <search string="Pengajuan Search">
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="state" domain="[]" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <menuitem id="menu_pengajuan_judul"
+            name="Pengajuan Judul"
+            parent="pkm_custom.pengajuan_menu_root"
+            action="action_pengajuan_judul"
+            sequence="1"/>
+
+</odoo>

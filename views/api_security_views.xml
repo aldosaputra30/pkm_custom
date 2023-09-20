@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_api_security_tree" model="ir.ui.view">
+        <field name="name">api.security.tree</field>
+        <field name="model">api.security</field>
+        <field name="arch" type="xml">
+            <tree string="API" export_xlsx="false" editable="bottom" create="false">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_api_security_form" model="ir.ui.view">
+        <field name="name">api.security.form</field>
+        <field name="model">api.security</field>
+        <field name="arch" type="xml">
+           <form string="API">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+              </form>
+        </field>
+    </record>
+
+    <record id="action_api_security" model="ir.actions.act_window">
+            <field name="name">API</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">api.security</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    
+    <menuitem id="menu_api_security"
+            name="Keamanan API"
+            action="action_api_security"
+            parent="pengajuan_menu_root"
+            groups="pkm_custom.group_pkm_admin"
+            sequence="5"/>
+
+</odoo>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_users_configuration_tree" model="ir.ui.view">
+        <field name="name">res.users.tree.configuration</field>
+        <field name="model">res.users</field>
+        <field name="arch" type="xml">
+            <tree string="User" export_xlsx="false">
+                <field name="name"/>
+                <field name="login" string="Username"/>
+                <!-- <field name="role"/> -->
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_users_configuration_form" model="ir.ui.view">
+        <field name="name">res.users.form.configuration</field>
+        <field name="model">res.users</field>
+        <field name="arch" type="xml">
+           <form string="User">
+                <header>
+                    <button name="remove_mahasiswa_group" string="Remove Mahasiswa Role" type="object" invisible="1"/>
+                </header>
+                <sheet>
+                    <field name="id" invisible="1"/>
+                    <field name="write_date" invisible="1"/>
+                    <div class="alert alert-info text-center mb-3" attrs="{'invisible': [('id', '&gt;', 0)]}" role="alert">
+                        Anda Membuat User Baru.
+                    </div>
+                    <field name="image_1920" widget="image" class="oe_avatar" options="{&quot;zoom&quot;: true, &quot;preview_image&quot;: &quot;image_128&quot;}"/>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" required="1"/></h1>
+                        <field name="email" invisible="1"/>
+                        <label for="company_id" class="oe_edit_only" groups="base.group_multi_company"/>
+                        <field name="company_id" context="{'user_preference': 0}" groups="base.group_multi_company"/>
+                    </div>
+                    <group name="phone_numbers">
+                        <field name="login" string="Username"/>
+                        <field name="create_new_pass" string="Password" password="True" attrs="{'invisible': [('write_date', '!=', False)],'required':[('write_date', '=', False)]}"/>
+                        <field name="email" string="Email"/>
+                        <field name="jenis_kelamin" string="Jenis Kelamin"/>
+                        <field name="phone" string="Nomor Handphone" widget="phone" options="{'enable_sms': false}"/>
+                        <!-- <field name="mobile" string="Nomor Handphone" widget="phone" options="{'enable_sms': false}"/> -->
+                        <field name="role" string="Peran" required="1"/>
+                    </group>
+                </sheet>
+              </form>
+        </field>
+    </record>
+
+    <record id="view_res_users_filter_pkm" model="ir.ui.view">
+        <field name="name">res.users.filter.pkm</field>
+        <field name="model">res.users</field>
+        <field name="arch" type="xml">
+            <search string="Pengajuan Search">
+                <group expand="0" string="Group By">
+                    <filter string="Peran" name="role" domain="[]" context="{'group_by':'role'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_users" model="ir.actions.act_window">
+            <field name="name">Users</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.users</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{
+              'search_default_role' : 1,
+              'tree_view_ref': 'pkm_custom.view_users_configuration_tree', 
+              'form_view_ref':'pkm_custom.view_users_configuration_form'}
+            </field>
+            <field name="domain">[]</field>
+        </record>
+    
+    <menuitem id="menu_configuration"
+            name="Management User"
+            action="action_users"
+            parent="pengajuan_menu_root"
+            groups="pkm_custom.group_pkm_admin"
+            sequence="4"/>
+
+    <menuitem name="Website"
+            id="website.menu_website_configuration"
+            sequence="9"
+            groups="pkm_custom.group_pkm_reviewer,pkm_custom.group_pkm_admin"
+            web_icon="website,static/description/icon.png"/>
+
+</odoo>
